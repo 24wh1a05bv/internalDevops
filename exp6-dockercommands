@@ -1,0 +1,193 @@
+exp 6:
+Step 1: Verify Docker installation
+
+Check the installed Docker version.
+
+docker --version
+
+Expected output (your system):
+
+Docker version 29.1.3, build 29.1.3-0ubuntu4.1
+Step 2: Check Docker service status
+sudo service docker status
+
+If Docker is not active, start it:
+
+sudo service docker start
+
+Verify that Docker can communicate with the engine:
+
+docker ps
+
+This displays the currently running containers. An empty table is normal if no containers are running.
+
+Step 3: Run the Hello World container
+
+Execute:
+
+sudo docker run hello-world
+
+Docker downloads the hello-world image if it is not already available, creates a container, and displays a confirmation message.
+
+Expected output:
+
+Hello from Docker!
+This message shows that your installation appears to be working correctly.
+Step 4: List Docker images
+docker images
+
+This displays the images stored locally, including their repository names, tags, IDs, and sizes.
+
+Images in your output included hello-world, nginx, and a Minikube image.
+
+Step 5: Download and run a BusyBox container
+
+Run the following command on one line:
+
+docker run -d --name demo busybox sh -c "while true; do echo hello; sleep 5; done"
+
+Explanation:
+
+docker run creates and starts a container.
+
+-d runs it in the background.
+
+--name demo assigns the container the name demo.
+
+busybox specifies the image.
+
+sh -c executes the supplied shell command.
+
+while true repeats continuously, printing hello every five seconds.
+
+Docker automatically downloads BusyBox if the image is not available locally.
+
+Important: Run this command only once while the container named demo exists. If you already created it, continue with Step 6 rather than running it again.
+
+Step 6: Verify the running container
+docker ps
+
+Expected output will contain a row similar to:
+
+CONTAINER ID   IMAGE     STATUS          NAMES
+993a9fe75ca3   busybox   Up ...          demo
+
+The container ID and elapsed time may differ. The Up status indicates that the container is running.
+
+To view its printed messages:
+
+docker logs demo
+Step 7: Create a file on the host system
+
+Create a text file in your current working directory:
+
+echo "Welcome to Docker" > message.txt
+
+Verify its contents:
+
+cat message.txt
+
+Expected output:
+
+Welcome to Docker
+Step 8: Copy the file into the container
+
+Use the correct docker cp syntax:
+
+docker cp message.txt demo:/tmp/message.txt
+
+Here:
+
+message.txt is the source file on Ubuntu.
+
+demo is the container name.
+
+/tmp/message.txt is the destination inside the container.
+
+Remember: Do not put a space between demo and :/tmp/message.txt.
+
+Verify the copied file:
+
+docker exec demo cat /tmp/message.txt
+
+Expected output:
+
+Welcome to Docker
+
+docker exec runs a command inside an already running container.
+
+Step 9: Inspect the container
+
+Execute:
+
+docker container inspect demo
+
+This displays detailed information about the container in JSON format, including:
+
+Container ID and name
+
+Image used
+
+Running or stopped status
+
+Startup command
+
+Network configuration and IP address
+
+Mounts and other configuration details
+
+To display only its current status, you can use:
+
+docker inspect -f '{{.State.Status}}' demo
+
+Expected output before stopping:
+
+running
+Step 10: Export the container filesystem
+
+Run:
+
+docker container export demo > demo-backup.tar
+
+This exports the container's filesystem as a TAR archive in the current directory.
+
+Check that the archive exists:
+
+ls -lh demo-backup.tar
+
+Note: docker export exports the container filesystem, but it does not preserve the image history or container configuration. It is not a complete backup of all Docker metadata or mounted volumes.
+
+Step 11: Stop the container
+
+Stop the running demo container:
+
+docker stop demo
+
+Expected output:
+
+demo
+
+Check the running containers:
+
+docker ps
+
+The demo container should no longer appear because it has stopped.
+
+To view both running and stopped containers, execute:
+
+docker ps -a
+
+You should see demo with an Exited status.
+
+Step 12: Verify the exported archive
+
+List the files in your current directory:
+
+ls
+
+You should find these files:
+
+message.txt
+demo-backup.tar
+
+This confirms that the host file was created and the container filesystem was exported.
