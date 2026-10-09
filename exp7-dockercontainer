@@ -1,0 +1,197 @@
+Step 1: Create the project directory
+mkdir -p ~/Projects/devopsexp/Dokerdemo
+cd ~/Projects/devopsexp/Dokerdemo
+Step 2: Create the Python application
+
+Create the file app.py:
+
+nano app.py
+
+Write the following code:
+
+print("Hello")
+
+Save the file using Ctrl+O, press Enter, and exit using Ctrl+X.
+
+Step 3: Create the Dockerfile
+nano Dockerfile
+
+Add the following instructions:
+
+FROM python:3.10
+
+COPY app.py .
+
+CMD ["python", "app.py"]
+
+Explanation:
+
+FROM python:3.10 specifies the base image containing Python 3.10.
+
+COPY app.py . copies the Python application into the image.
+
+CMD ["python", "app.py"] executes the Python program when the container starts.
+
+Step 4: Build the Docker image
+docker build -t python-demo .
+
+The command creates a Docker image named python-demo using the instructions in the Dockerfile.
+
+Step 5: Run the container
+docker run python-demo
+
+Expected output:
+
+Hello
+
+The application executes inside the container and prints Hello in the terminal. Since the program finishes immediately, the container exits normally.
+
+Step 6: Verify the container
+docker ps -a
+
+This command displays all containers, including stopped containers. The Python container should show Exited (0), indicating successful execution.
+
+Version 2: Python Web Application in Docker
+
+In this version, the Python application runs a web server. Docker port mapping allows the application to be accessed through a browser.
+
+Step 1: Update the Python application
+
+Open the existing app.py file:
+
+nano app.py
+
+Replace its contents with:
+
+from http.server import HTTPServer, BaseHTTPRequestHandler
+
+class MyHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.send_header("Content-type", "text/html")
+        self.end_headers()
+
+        self.wfile.write(b"""
+        <html>
+        <body>
+            <h1>Hello from Docker!</h1>
+            <p>My web application is running inside a Docker container.</p>
+        </body>
+        </html>
+        """)
+
+server = HTTPServer(("0.0.0.0", 8000), MyHandler)
+
+print("Server running on port 8000", flush=True)
+server.serve_forever()
+
+Save and exit the editor.
+
+Explanation:
+
+HTTPServer creates a web server.
+
+BaseHTTPRequestHandler handles incoming HTTP requests.
+
+do_GET() responds to browser requests.
+
+The HTML content displays a heading and message on the webpage.
+
+0.0.0.0 allows the server to accept connections on the container's network interfaces.
+
+Port 8000 is used by the web server.
+
+serve_forever() keeps the server running to handle requests.
+
+Step 2: Update the Dockerfile
+nano Dockerfile
+
+Replace its contents with:
+
+FROM python:3.10
+
+WORKDIR /app
+
+COPY app.py .
+
+EXPOSE 8000
+
+CMD ["python", "app.py"]
+
+Explanation:
+
+FROM python:3.10 selects the base image.
+
+WORKDIR /app sets the working directory inside the container.
+
+COPY app.py . copies the application into the container image.
+
+EXPOSE 8000 documents the port used by the application.
+
+CMD starts the Python web server.
+
+Step 3: Build the Docker image
+docker build -t python-demo .
+
+The image is rebuilt to include the updated web application.
+
+Step 4: Run the container with port mapping
+docker run --name python-web -p 8000:8000 python-demo
+
+Explanation of the command:
+
+--name python-web assigns a name to the container.
+
+-p 8000:8000 maps port 8000 on the host to port 8000 inside the container.
+
+python-demo specifies the image used to create the container.
+
+The terminal displays:
+
+Server running on port 8000
+
+Keep the terminal open while accessing the application.
+
+Step 5: Access the web application
+
+Open a web browser and enter:
+
+http://localhost:8000
+
+The webpage displays:
+
+localhost:8000
+
+Hello from Docker!
+My web application is running inside a Docker container.
+
+When the browser accesses the page, the terminal displays an HTTP request with status code 200, indicating a successful response.
+
+Step 6: Verify the running container
+
+Open another terminal and execute:
+
+docker ps
+
+This displays running containers and their port mappings. The python-web container should show a mapping similar to:
+
+0.0.0.0:8000->8000/tcp
+
+To view the container logs, run:
+
+docker logs python-web
+Step 7: Stop and restart the container
+
+To stop the running container, press Ctrl+C in the terminal running the server.
+
+To start the same container again:
+
+docker start python-web
+
+Verify its status:
+
+docker ps
+
+Then revisit http://localhost:8000 in the browser.
+
+Note: If you stop the container using Ctrl+C, Docker may retain the stopped container under the name python-web. Use docker start python-web to reuse it instead of creating another container with the same name. If you need to recreate it, first remove the stopped container with docker rm python-web.
