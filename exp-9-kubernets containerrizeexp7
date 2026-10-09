@@ -1,0 +1,115 @@
+Step 1: Navigate to your Exercise 7 directory
+cd ~/Projects/devopsexp/Dokerdemo
+
+Check that app.py and Dockerfile contain the web application version, not the simple print("Hello") version.
+
+Step 2: Build the Docker image
+docker build -t python-demo:1.0 .
+
+Load the image into Minikube:
+
+minikube image load python-demo:1.0
+Step 3: Create a Kubernetes configuration file
+nano k8s-app.yaml
+
+Paste this configuration:
+
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python-web
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: python-web
+  template:
+    metadata:
+      labels:
+        app: python-web
+    spec:
+      containers:
+        - name: python-web
+          image: python-demo:1.0
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: python-web-service
+spec:
+  type: NodePort
+  selector:
+    app: python-web
+  ports:
+    - port: 8000
+      targetPort: 8000
+
+Save using Ctrl+O, Enter, and Ctrl+X.
+
+What this does:
+
+replicas: 2 asks Kubernetes to maintain two copies of your web application.
+
+containerPort: 8000 identifies the port your Python server listens on.
+
+The Service provides a common endpoint for accessing the application.
+
+imagePullPolicy: Never tells Kubernetes to use the locally loaded image.
+
+Step 4: Deploy the application
+
+Make sure Minikube is running:
+
+minikube start --driver=docker
+
+Apply the configuration:
+
+kubectl apply -f k8s-app.yaml
+Step 5: Verify automatic deployment
+kubectl get deployments
+kubectl get pods
+kubectl get services
+
+Wait until both pods are Running and the deployment shows 2/2 ready replicas.
+
+Step 6: Access the web application
+
+Run:
+
+minikube service python-web-service --url
+
+Open the URL returned by the command in your browser. You should see:
+
+Hello from Docker!
+
+My web application is running inside a Docker container.
+
+Keep the terminal running if the command maintains a forwarding process.
+
+Step 7: Demonstrate Kubernetes automation
+
+Scale the application from two replicas to three:
+
+kubectl scale deployment python-web --replicas=3
+
+Verify:
+
+kubectl get deployments
+kubectl get pods
+
+You should see three ready replicas once Kubernetes finishes creating the additional pod.
+
+Restore the original two-replica configuration:
+
+kubectl apply -f k8s-app.yaml
+Step 8: Clean up after the experiment
+
+If you need to remove the Kubernetes resources after your demonstration:
+
+kubectl delete -f k8s-app.yaml
+
+This deletes the Deployment and Service created by this configuration, without removing your Docker image or uninstalling Docker.
