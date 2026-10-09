@@ -1,0 +1,60 @@
+Procedure
+Step 1: Verify Docker
+
+Run:
+
+docker --version
+docker ps
+
+Docker should be running and accessible.
+
+Step 2: Check Kubernetes
+
+Run:
+
+minikube status
+kubectl config current-context
+
+Your earlier error indicates that Kubernetes is not reachable, so we need to fix this before proceeding.
+
+Step 3: Start Kubernetes using Minikube
+
+If Minikube is installed but stopped, run:
+
+minikube start --driver=docker
+
+Then verify:
+
+kubectl get nodes
+kubectl cluster-info
+
+You should see a Kubernetes node in the Ready state.
+
+Step 4: Deploy a Docker image in Kubernetes
+
+Use the existing Python image from your previous Docker experiment:
+
+kubectl create deployment python-demo --image=python:3.10
+
+Check the deployment and pod:
+
+kubectl get deployments
+kubectl get pods
+
+The pod may take a little time to download the image and start.
+
+Step 5: Verify the integration
+kubectl describe deployment python-demo
+kubectl describe pod <pod-name>
+
+Replace <pod-name> with the actual pod name shown by kubectl get pods.
+
+Kubernetes will manage the application through its deployment and pod resources, while Docker provides the container runtime through Minikube's Docker-based setup.
+
+Step 6: Clean up after the experiment
+
+When you've completed your demonstration:
+
+kubectl delete deployment python-demo
+
+This removes the test deployment without deleting your Docker installation.
