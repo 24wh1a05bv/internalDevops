@@ -51,6 +51,7 @@ The command creates a Docker image named python-demo using the instructions in t
 
 Step 5: Run the container
 docker run python-demo
+docker run -p 5000:5000 python-demo
 
 Expected output:
 
