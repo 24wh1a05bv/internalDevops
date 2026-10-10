@@ -10,6 +10,14 @@ nano app.py
 Write the following code:
 
 print("Hello")
+/
+from flask import Flask
+app = Flask(__name__)
+@app.route("/")
+def home():
+   return "hello the is container docker"
+if __name__ == " __main__" :
+   app.run(host = "0.0.0.0",port = 5000)
 
 Save the file using Ctrl+O, press Enter, and exit using Ctrl+X.
 
@@ -18,9 +26,13 @@ nano Dockerfile
 
 Add the following instructions:
 
-FROM python:3.10
+FROM python:3.10-slim
+WORKDIR /app
+COPY requirements.txt
+RUN pip install --no-cache-dir -r requirement.txt
 
 COPY app.py .
+EXPOSE 5000
 
 CMD ["python", "app.py"]
 
