@@ -1,0 +1,102 @@
+Step 1: Verify Java and Maven
+java -version
+mvn -version
+
+
+Step 2: Download the Spring Boot project
+1. Open Spring Initializr in your browser.
+2. Select Maven, Java, and Spring Web.
+3. Enter Group as com.example and Artifact as demo.
+4. Select Java 21 and click Generate.
+The downloaded file will be named demo.zip.
+Step 3: Locate and extract the ZIP file in Ubuntu
+Assuming the ZIP file is in your Windows Downloads folder, Ubuntu can access it through /mnt/c/Users/.
+First, locate the ZIP file:
+find /mnt/c/Users -name "demo.zip" 2>/dev/null
+
+
+Copy the path displayed by the command. Then extract it into your DevOps experiment directory. For example, if the file is in /mnt/c/Users/YourUser/Downloads/:
+mkdir -p ~/Projects/devopsexp
+cd ~/Projects/devopsexp
+unzip /mnt/c/Users/YourUser/Downloads/demo.zip
+
+
+Replace YourUser with your actual Windows user-folder name.
+If unzip is not installed, run:
+sudo apt update
+sudo apt install unzip
+
+
+Then repeat the extraction command.
+Step 4: Navigate to the project
+cd ~/Projects/devopsexp/demo
+ls
+
+
+Confirm that pom.xml and src are present.
+Step 5: Create the Hello Spring Boot controller
+nano src/main/java/com/example/demo/HomeController.java
+
+
+Enter:
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class HomeController {
+
+    @GetMapping("/")
+    public String home() {
+        return "Hello Spring Boot!";
+    }
+}
+
+
+Save with Ctrl + O, press Enter, and exit with Ctrl + X.
+Step 6: Run the application
+mvn spring-boot:run
+
+
+Wait until Spring Boot reports that Tomcat has started on port 8080.
+If port 8080 is already occupied, identify the process:
+sudo lsof -i :8080
+
+
+Stop the conflicting process only if appropriate.
+Step 7: Test in your browser
+Open:
+http://localhost:8080
+Expected output:
+Hello Spring Boot!
+
+if port busy:
+If port 8080 is busy
+Step 1: Find the PID using port 8080
+sudo lsof -i :8080
+
+
+Example output:
+COMMAND   PID   USER   FD   TYPE DEVICE SIZE/OFF NODE NAME
+java     12345 aaibaba  45u  IPv6 ...   TCP *:http-alt (LISTEN)
+
+
+Here, 12345 is the PID (your actual PID will differ).
+Step 2: Kill the process
+Replace 12345 with the PID shown in your terminal:
+kill 12345
+
+
+If the process does not stop, forcefully terminate it:
+kill -9 12345
+
+
+Step 3: Verify that the port is free
+sudo lsof -i :8080
+
+
+If no output appears, nothing is listening on port 8080.
+Step 4: Run Spring Boot again
+mvn spring-boot:run
+
