@@ -1,0 +1,259 @@
+Experiment 5 — Spring Boot Testing for a Containerized Application
+Step 1: Check the required software
+Open Ubuntu and run:
+java -version
+mvn -version
+docker --version
+docker ps
+
+
+If Docker isn't running, start Docker Desktop in Windows and ensure its Ubuntu/WSL integration is enabled.
+Step 2: Create a new Spring Boot project
+Create a separate folder:
+mkdir -p ~/Projects/devopsexp/springboot-exp5
+cd ~/Projects/devopsexp/springboot-exp5
+
+
+Create the project structure:
+mkdir -p src/main/java/com/example/demo
+mkdir -p src/test/java/com/example/demo
+
+
+Step 3: Create pom.xml
+Run:
+nano pom.xml
+
+
+Paste the following Maven configuration:
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.4.5</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>com.example</groupId>
+    <artifactId>springboot-exp5</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>springboot-exp5</name>
+
+    <properties>
+        <java.version>21</java.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>
+
+
+
+Save using Ctrl + O, Enter, and Ctrl + X.
+Step 4: Create the main Spring Boot application
+nano src/main/java/com/example/demo/DemoApplication.java
+
+
+Paste:
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class DemoApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(DemoApplication.class, args);
+    }
+}
+
+
+Save and exit.
+Step 5: Create a REST controller
+nano src/main/java/com/example/demo/HelloController.java
+
+
+Paste:
+package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class HelloController {
+
+    @GetMapping("/")
+    public String home() {
+        return "Spring Boot application is running!";
+    }
+
+    @GetMapping("/add")
+    public int add(@RequestParam int a, @RequestParam int b) {
+        return a + b;
+    }
+}
+
+
+This application provides two endpoints:
+- / — displays a welcome message.
+- /add?a=10&b=20 — returns the sum, 30.
+Step 6: Write the Spring Boot test cases
+Create the test file:
+nano src/test/java/com/example/demo/HelloControllerTest.java
+
+
+Paste:
+package com.example.demo;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.web.servlet.MockMvc;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@SpringBootTest
+@AutoConfigureMockMvc
+class HelloControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Test
+    void testHome() throws Exception {
+        mockMvc.perform(get("/"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(
+                        "Spring Boot application is running!"));
+    }
+
+    @Test
+    void testAddition() throws Exception {
+        mockMvc.perform(get("/add")
+                        .param("a", "10")
+                        .param("b", "20"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("30"));
+    }
+}
+
+
+Save and exit.
+These tests verify the HTTP status and the response returned by each endpoint.
+Step 7: Execute the test cases
+From the project directory, run:
+mvn clean test
+
+
+Wait for Maven to download dependencies and execute the tests.
+Expected result:
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0
+
+BUILD SUCCESS
+
+
+The exact output may vary. Do not proceed until the tests pass.
+Step 8: Package the application
+mvn clean package
+
+
+Verify that the JAR file exists:
+ls target/*.jar
+
+
+Step 9: Create the Dockerfile
+nano Dockerfile
+
+
+Paste:
+FROM eclipse-temurin:21-jre
+WORKDIR /app
+COPY target/springboot-exp5-0.0.1-SNAPSHOT.jar app.jar
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "app.jar"]
+
+
+Save and exit.
+Step 10: Build the Docker image
+Ensure Docker Desktop is running and then execute:
+docker build -t springboot-exp5 .
+
+
+Verify:
+docker images
+
+
+You should see an image named springboot-exp5.
+Step 11: Run the container
+Run the application on host port 8081:
+docker run -d --name springboot-exp5-container -p 8081:8080 springboot-exp5
+
+
+Check the container:
+docker ps
+
+
+View its startup logs:
+docker logs springboot-exp5-container
+
+
+Wait until the logs indicate that Spring Boot has started.
+If the container name is already in use from an earlier attempt, remove the old container first:
+docker rm -f springboot-exp5-container
+
+
+If port 8081 is busy, use another host port, such as 8082, with -p 8082:8080.
+Step 12: Test the running container
+Run these commands from Ubuntu:
+curl http://localhost:8081/
+
+
+Expected output:
+Spring Boot application is running!
+
+
+Test addition:
+curl "http://localhost:8081/add?a=10&b=20"
+
+
+Expected output:
+30
+
+
+You can also open these URLs in your Windows browser:
+- http://localhost:8081/
+- http://localhost:8081/add?a=10&b=20
+Step 13: Stop the container
+After verification:
+docker stop springboot-exp5-container
+
+
+To remove it later:
+docker rm springboot-exp5-contain
