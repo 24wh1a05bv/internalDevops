@@ -1,0 +1,43 @@
+Step 1: Verify Java and Maven
+java -version
+mvn -version
+
+
+Step 2: Navigate to the experiment directory
+cd ~/Projects/devopsexp
+
+
+Step 3: Generate the Karate project
+mvn archetype:generate \
+-DarchetypeGroupId=com.intuit.karate \
+-DarchetypeArtifactId=karate-archetype \
+-DarchetypeVersion=1.4.1 \
+-DgroupId=com.example \
+-DartifactId=karate-demo \
+-DinteractiveMode=false
+
+
+Step 4: Navigate to the project
+cd ~/Projects/devopsexp/karate-demo
+ls
+
+
+Step 5: Execute the test cases
+mvn test -Dtest=examples.users.UsersRunner
+
+
+Step 6: Verify the results
+The successful execution showed:
+Tests run: 2
+Failures: 0
+Errors: 0
+Skipped: 0
+BUILD SUCCESS
+
+
+Step 7: Open the HTML report
+From Ubuntu, run:
+explorer.exe "$(wslpath -w target/karate-reports/karate-summary.html)"
+
+
+This command launches the HTML report in your Windows browser from the Ubuntu terminal.
