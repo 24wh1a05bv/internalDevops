@@ -1,0 +1,133 @@
+Karate
+Step 1: Check the required software
+Run these commands in Ubuntu:
+node --version
+npm --version
+java -version
+mvn -version
+
+
+If these commands display their versions, proceed.
+Step 2: Create the project folder
+cd ~/Projects/devopsexp
+mkdir karate-js
+cd karate-js
+npm init -y
+npm install express
+
+
+Step 3: Write the JavaScript program
+Create a file named app.js:
+nano app.js
+
+
+Paste this code:
+const express = require('express');
+
+const app = express();
+app.get('/', (req, res) => {
+    res.send('JavaScript API is running!');
+});
+
+app.get('/add', (req, res) => {
+    const a = Number(req.query.a);
+    const b = Number(req.query.b);
+
+    res.json({
+        result: a + b
+    });
+});
+
+app.listen(3000, () => {
+    console.log('Server running on port 3000');
+});
+
+
+Save using Ctrl + O, press Enter, and exit using Ctrl + X.
+Explanation: The JavaScript program creates an API at /add. It accepts two numbers through query parameters and returns their sum as JSON.
+Step 4: Run the JavaScript program
+node app.js
+
+
+Expected output:
+Server running on port 3000
+
+
+Keep this terminal open while running the tests.
+Step 5: Set up Karate
+Open a second Ubuntu terminal and run:
+cd ~/Projects/devopsexp
+
+
+Generate the Karate test project:
+mvn archetype:generate \
+-DarchetypeGroupId=com.intuit.karate \
+-DarchetypeArtifactId=karate-archetype \
+-DarchetypeVersion=1.4.1 \
+-DgroupId=com.example \
+-DartifactId=karate-js-test \
+-DinteractiveMode=false
+
+
+Enter the generated folder:
+cd ~/Projects/devopsexp/karate-js-test
+
+
+Step 6: Create the Karate test file
+Create the feature file:
+nano src/test/java/examples/users/addition.feature
+
+
+Paste:
+Feature: Test JavaScript Addition API
+
+  Scenario: Add two positive numbers
+    Given url 'http://localhost:3000/add'
+    And param a = 10
+    And param b = 20
+    When method get
+    Then status 200
+    And match response == { result: 30 }
+
+  Scenario: Add two more numbers
+    Given url 'http://localhost:3000/add'
+    And param a = 5
+    And param b = 7
+    When method get
+    Then status 200
+    And match response == { result: 12 }
+
+
+Save and exit using Ctrl + O, Enter, and Ctrl + X.
+Step 7: Run the Karate tests
+In the second terminal, execute:
+mvn test -Dtest=examples.users.UsersRunner
+
+
+This runs the Karate runner, which discovers the .feature files in the test package.
+Expected result if both tests pass:
+Tests run: 2, Failures: 0, Errors: 0
+BUILD SUCCESS
+
+
+The exact output may vary. Make sure the JavaScript server is still running on port 3000.
+Step 8: View the test report
+Run:
+explorer.exe "$(wslpath -w target/karate-reports/karate-summary.html)"
+
+
+The Karate HTML report should open, showing the test results.
+Step 9: Stop the JavaScript server
+Return to the first terminal and press:
+Ctrl + C
+
+
+If port 3000 is busy, identify the process:
+sudo lsof -i :3000
+
+
+Then stop the appropriate PID, replacing 12345 with the actual PID:
+kill 12345
+
+
+Use kill -9 12345 only if the process does not stop normally. Check the process before killing it.
