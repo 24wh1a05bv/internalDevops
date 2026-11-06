@@ -14,6 +14,18 @@ Step 1: Update the system
       Step 4: Add the Jenkins repository 
       echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/" | sudo      
      tee \ /etc/apt/sources.list.d/jenkins.list > /dev/null 
+
+/////////////////// another way:  sudo wget -O /etc/apt/keyrings/jenkins-keyring.asc \
+  https://pkg.jenkins.io/debian-stable/jenkins.io-2026.key
+echo "deb [signed-by=/etc/apt/keyrings/jenkins-keyring.asc]" \
+  https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
+  /etc/apt/sources.list.d/jenkins.list > /dev/null
+
+
+
+sudo apt update
+sudo apt install jenkins
+
  
      Step 5: Update package list 
      Sudo apt update 
