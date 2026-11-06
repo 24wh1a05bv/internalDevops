@@ -37,6 +37,9 @@ BUILD SUCCESS
 
 Step 7: Open the HTML report
 From Ubuntu, run:
+xdg-open target/karate-reports/karate-summary.html
+sudo apt install xdg-utils -y
+//wsl
 explorer.exe "$(wslpath -w target/karate-reports/karate-summary.html)"
 
 
