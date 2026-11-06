@@ -51,6 +51,7 @@ sudo apt install jenkins
      http://<your-ip-address>:8080 
  
       Step 12: Unlock Jenkins 
+
  Paste the administrator password. 
  Click Continue. 
  
