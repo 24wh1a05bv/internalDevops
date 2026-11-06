@@ -50,6 +50,9 @@ Step 1: Update the system
  Password 
  Full Name 
  Email Address 
+if already present sudo nano  /var/lib/jenkins/config.xml
+keep false near useSecurity and then avanti@avanti-IdeaPad-Slim-3-15IRH10:~$ sudo systemctl restart jenkins
+if already started
 
  
     Step 15: Explore the Jenkins environment 
