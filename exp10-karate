@@ -1,8 +1,21 @@
 Step 1: Verify Java and Maven
 java -version
 mvn -version
+javav -21   1. Install Java 21
+sudo apt update
+sudo apt install openjdk-21-jdk -y
 
 
+2. Switch your default Java version
+sudo update-alternatives --config java
+
+
+You'll see a list of installed Java versions. Select the entry for Java 21.
+
+Do the same for the compiler:
+sudo update-alternatives --config javac
+
+--------------
 Step 2: Navigate to the experiment directory
 cd ~/Projects/devopsexp
 
