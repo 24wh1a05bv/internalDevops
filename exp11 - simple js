@@ -131,3 +131,33 @@ kill 12345
 
 
 Use kill -9 12345 only if the process does not stop normally. Check the process before killing it.
+----------------------------------------------------------------------------------
+hello.js
+avanti@avanti-IdeaPad-Slim-3-15IRH10:~/projects/devops/karate-demo/src/test/java/examples$ cat hello.js
+function hello() {
+    return 'Hello from JS';
+}
+avanti@avanti-IdeaPad-Slim-3-15IRH10:~/projects/devops/karate-demo/src/test/java/examples$ cat hello.feature 
+Feature: Run JavaScript file and assert the result
+
+Scenario: Call hello() from hello.js
+
+  * def mod = read('hello.js')
+  * def result = mod.hello()
+  * match result == 'Hello from JS'
+avanti@avanti-IdeaPad-Slim-3-15IRH10:~/projects/devops/karate-demo/src/test/java/examples$ cat KarateRunner.java 
+package examples;
+
+import com.intuit.karate.junit5.Karate;
+
+class KarateRunner {
+
+    @Karate.Test
+    Karate testAll() {
+        return Karate.run("hello").relativeTo(getClass());
+    }
+}
+avanti@avanti-IdeaPad-Slim-3-15IRH10:~/projects/devops/karate-demo/src/test/java/examples$ nano  hello.feature 
+/karate-demo$ mvn clean test
+xdg-open target/karate-reports/karate-summary.html
+
