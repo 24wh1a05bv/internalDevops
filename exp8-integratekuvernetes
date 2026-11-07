@@ -29,6 +29,7 @@ kubectl get nodes
 kubectl cluster-info
 
 You should see a Kubernetes node in the Ready state.
+-----------------------
 
 Step 4: Deploy a Docker image in Kubernetes
 
