@@ -5,7 +5,13 @@ Run:
 
 docker --version
 docker ps
-
+---install kubectl,minkube---
+sudo snap install kubectl --classic
+kubectl 1.35.10 from Canonical✓ installed
+avanti@avanti-IdeaPad-Slim-3-15IRH10:~/projects/devops$ kubectl version --client
+curl -LO https://github.com/kubernetes/minikube/releases/latest/download/minikube-linux-amd64
+sudo install minikube-linux-amd64 /usr/local/bin/minikube
+minikube version
 Docker should be running and accessible.
 
 Step 2: Check Kubernetes
